@@ -30,9 +30,30 @@
             nums))
 
 (defn euler-5 []
-  (take 1 (filter #(divisible-by-all? % 
-                                      (take-while (partial > 21))) 
+  (take 1 (filter #(divisible-by-all? 
+                    %
+                    (range 1 21))
                   (iterate inc 1))))
+
+;; The sum of the squares of the first ten natural numbers is,
+;; 12 + 22 + ... + 102 = 385
+;; The square of the sum of the first ten natural numbers is,
+;; (1 + 2 + ... + 10)2 = 552 = 3025
+;; Hence the difference between the sum of the squares of the first ten natural numbers and the square of the sum is 3025 - 385 = 2640.
+;; Find the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.
+(defn square-of [x]
+  (* x x))
+
+(defn sum-of-squares [nums]
+  (reduce + (map square-of nums)))
+
+(defn sum-of [nums]
+  (reduce + nums))
+
+(defn euler-6 []
+  (let [first-twenty-numbers (range 1 21)]
+    (- (square-of (sum-of first-twenty-numbers))
+       (sum-of-squares first-twenty-numbers))))
 
 ;; By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.
 ;; What is the 10 001st prime number?
