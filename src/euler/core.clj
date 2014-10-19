@@ -24,13 +24,8 @@
 
 ;; 2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
 ;; What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
-(defn divisible-by-all? [x nums]
-  (not-any? (fn [y]
-              (pos? (rem x y)))
-            nums))
-
 (defn euler-5 []
-  (take 1 (filter #(divisible-by-all? 
+  (take 1 (filter #(common/divisible-by-all? 
                     %
                     (range 1 21))
                   (iterate inc 1))))
@@ -39,29 +34,170 @@
 ;; 12 + 22 + ... + 102 = 385
 ;; The square of the sum of the first ten natural numbers is,
 ;; (1 + 2 + ... + 10)2 = 552 = 3025
+
 ;; Hence the difference between the sum of the squares of the first ten natural numbers and the square of the sum is 3025 - 385 = 2640.
 ;; Find the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.
-(defn square-of [x]
-  (* x x))
-
-(defn sum-of-squares [nums]
-  (reduce + (map square-of nums)))
-
-(defn sum-of [nums]
-  (reduce + nums))
-
 (defn euler-6 []
-  (let [first-twenty-numbers (range 1 21)]
-    (- (square-of (sum-of first-twenty-numbers))
-       (sum-of-squares first-twenty-numbers))))
+  (let [first-hundred-numbers (range 1 101)]
+    (- (common/square-of (common/sum-of first-hundred-numbers))
+       (common/sum-of-squares first-hundred-numbers))))
 
 ;; By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.
 ;; What is the 10 001st prime number?
 (defn euler-7 []
   (last (take 10001 common/primes)))
 
+;; The four adjacent digits in the 1000-digit number that have the greatest product are 9 × 9 × 8 × 9 = 5832.
+;;
+;; 73167176531330624919225119674426574742355349194934
+;; 96983520312774506326239578318016984801869478851843
+;; 85861560789112949495459501737958331952853208805511
+;; 12540698747158523863050715693290963295227443043557
+;; 66896648950445244523161731856403098711121722383113
+;; 62229893423380308135336276614282806444486645238749
+;; 30358907296290491560440772390713810515859307960866
+;; 70172427121883998797908792274921901699720888093776
+;; 65727333001053367881220235421809751254540594752243
+;; 52584907711670556013604839586446706324415722155397
+;; 53697817977846174064955149290862569321978468622482
+;; 83972241375657056057490261407972968652414535100474
+;; 82166370484403199890008895243450658541227588666881
+;; 16427171479924442928230863465674813919123162824586
+;; 17866458359124566529476545682848912883142607690042
+;; 24219022671055626321111109370544217506941658960408
+;; 07198403850962455444362981230987879927244284909188
+;; 84580156166097919133875499200524063689912560717606
+;; 05886116467109405077541002256983155200055935729725
+;;71636269561882670428252483600823257530420752963450
+;;
+;; Find the thirteen adjacent digits in the 1000-digit number that have the greatest product. What is the value of this product?
+(defn euler-8 []
+  (let [num-as-str (str "73167176531330624919225119674426574742355349194934"
+                        "96983520312774506326239578318016984801869478851843"
+                        "85861560789112949495459501737958331952853208805511"
+                        "12540698747158523863050715693290963295227443043557"
+                        "66896648950445244523161731856403098711121722383113"
+                        "62229893423380308135336276614282806444486645238749"
+                        "30358907296290491560440772390713810515859307960866"
+                        "70172427121883998797908792274921901699720888093776"
+                        "65727333001053367881220235421809751254540594752243"
+                        "52584907711670556013604839586446706324415722155397"
+                        "53697817977846174064955149290862569321978468622482"
+                        "83972241375657056057490261407972968652414535100474"
+                        "82166370484403199890008895243450658541227588666881"
+                        "16427171479924442928230863465674813919123162824586"
+                        "17866458359124566529476545682848912883142607690042"
+                        "24219022671055626321111109370544217506941658960408"
+                        "07198403850962455444362981230987879927244284909188"
+                        "84580156166097919133875499200524063689912560717606"
+                        "05886116467109405077541002256983155200055935729725"
+                        "71636269561882670428252483600823257530420752963450")]
+    (apply max 
+           (map
+            #(reduce (fn [x y] 
+                       (* (bigdec (str x)) 
+                          (bigdec (str y)))) %)
+            (partition 13 1 (seq num-as-str))))))
+
+;; A Pythagorean triplet is a set of three natural numbers, a < b < c, for which,
+;; a2 + b2 = c2
+;;
+;; For example, 32 + 42 = 9 + 16 = 25 = 52.
+;; 
+;; There exists exactly one Pythagorean triplet for which a + b + c = 1000.
+;; Find the product abc.
+(defn euler-9 []
+  (for [x (range 1 1000)
+        y (range (inc x) 1000)
+        z (range (inc y) 1000)
+        :when (and (= (+ (* x x)
+                         (* y y))
+                      (* z z))
+                   (= 1000
+                      (+ x y z)))]
+    (* x y z)))
+
 ;; The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
 ;; Find the sum of all the primes below two million.
 (defn euler-10 []
   (reduce + (take-while (partial > 2000000) common/primes)))
 
+;; The sequence of triangle numbers is generated by adding the natural numbers. So the 7th triangle number would be 1 + 2 + 3 + 4 + 5 + 6 + 7 = 28. The first ten terms would be:
+;;
+;; 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, ...
+;;
+;; Let us list the factors of the first seven triangle numbers:
+;;
+;;      1: 1
+;;      3: 1,3
+;;      6: 1,2,3,6
+;;     10: 1,2,5,10
+;;     15: 1,3,5,15
+;;     21: 1,3,7,21
+;;     28: 1,2,4,7,14,28
+;;
+;; We can see that 28 is the first triangle number to have over five divisors.
+;;
+;; What is the value of the first triangle number to have over five hundred divisors?
+(defn euler-12 []
+  (take 1
+        (filter #(< 500
+                    (count (common/factors-of %)))
+                common/triangle-numbers)))
+
+;; n! means n × (n - 1) × ... × 3 × 2 × 1
+;;
+;; For example, 10! = 10 × 9 × ... × 3 × 2 × 1 = 3628800,
+;; and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
+;;
+;; Find the sum of the digits in the number 100!
+(defn euler-20 []
+  (reduce + 
+          (map (comp bigdec str) 
+               (seq (str (last 
+                          (take 100 common/factorial)))))))
+
+;; The following iterative sequence is defined for the set of positive integers:
+;;
+;; n -> n/2 (n is even)
+;; n -> 3n + 1 (n is odd)
+;;
+;; Using the rule above and starting with 13, we generate the following sequence:
+;; 13 -> 40 -> 20 -> 10 -> 5 -> 16 -> 8 -> 4 -> 2 -> 1
+;;
+;; It can be seen that this sequence (starting at 13 and finishing at 1) contains 10 terms. Although it has not been proved yet (Collatz Problem), it is thought that all starting numbers finish at 1.
+;;
+;; Which starting number, under one million, produces the longest chain?
+;;
+;; NOTE: Once the chain starts the terms are allowed to go above one million.
+(defn euler-14 []
+  (take 1
+        (sort-by second >
+                 (map (fn [x] [x (count (collatz-seq x))])
+                      (range 2 1000001)))))
+
+;; The Fibonacci sequence is defined by the recurrence relation:
+;;
+;;     Fn = Fn-1 + Fn-2, where F1 = 1 and F2 = 1.
+;;
+;; Hence the first 12 terms will be:
+;;
+;;     F1 = 1
+;;     F2 = 1
+;;     F3 = 2
+;;     F4 = 3
+;;     F5 = 5
+;;     F6 = 8
+;;     F7 = 13
+;;     F8 = 21
+;;     F9 = 34
+;;     F10 = 55
+;;     F11 = 89
+;;     F12 = 144
+;;
+;; The 12th term, F12, is the first term to contain three digits.
+;;
+;; What is the first term in the Fibonacci sequence to contain 1000 digits?
+(defn euler-25 []
+  (count (take-while #(> 1000 (count (seq (str %)))) 
+                     common/fib)))
